@@ -3,13 +3,35 @@ import React, { useState } from "react";
 export default function ResumeForm({ initial = {}, onSave, onCancel }) {
   const [title, setTitle] = useState(initial.title || "");
   const [personal, setPersonal] = useState(initial.personal || { fullName: "" });
-  const [education, setEducation] = useState(initial.education || "");
-  const [skills, setSkills] = useState(initial.skills || "");
-  const [experience, setExperience] = useState(initial.experience || "");
+  const [education, setEducation] = useState(
+    initial.education?.[0]?.school || ""
+  );
+  const [skills, setSkills] = useState(
+    Array.isArray(initial.skills) ? initial.skills.join(", ") : ""
+  );
+  const [experience, setExperience] = useState(
+    initial.experience?.[0]?.company || ""
+  );
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave({ title, personal, education, skills, experience });
+
+    // ✅ Format data according to backend schema
+    const formattedData = {
+      title,
+      personal,
+      education: education
+        ? [{ school: education, degree: "", from: "", to: "" }]
+        : [],
+      skills: skills
+        ? skills.split(",").map((s) => s.trim())
+        : [],
+      experience: experience
+        ? [{ company: experience, role: "", from: "", to: "", description: "" }]
+        : [],
+    };
+
+    onSave(formattedData);
   };
 
   return (

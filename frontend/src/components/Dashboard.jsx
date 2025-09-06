@@ -47,10 +47,41 @@ export default function Dashboard({ token, user, api }) {
     doc.setFontSize(16);
     doc.text(resume.title || "Resume", 10, 20);
     doc.setFontSize(12);
+
     doc.text(`Name: ${resume.personal?.fullName || ""}`, 10, 30);
-    doc.text(`Education: ${resume.education || ""}`, 10, 40);
-    doc.text(`Skills: ${resume.skills || ""}`, 10, 50);
-    doc.text(`Experience: ${resume.experience || ""}`, 10, 60);
+
+    // Education
+    if (resume.education?.length > 0) {
+      doc.text("Education:", 10, 40);
+      resume.education.forEach((edu, i) => {
+        doc.text(
+          `- ${edu.school} (${edu.degree}) ${edu.from} - ${edu.to}`,
+          15,
+          50 + i * 10
+        );
+      });
+    }
+
+    // Skills
+    if (resume.skills?.length > 0) {
+      doc.text("Skills: " + resume.skills.join(", "), 10, 80);
+    }
+
+    // Experience
+    if (resume.experience?.length > 0) {
+      doc.text("Experience:", 10, 100);
+      resume.experience.forEach((exp, i) => {
+        doc.text(
+          `- ${exp.company}, ${exp.role} (${exp.from} - ${exp.to})`,
+          15,
+          110 + i * 10
+        );
+        if (exp.description) {
+          doc.text(`  ${exp.description}`, 20, 115 + i * 10);
+        }
+      });
+    }
+
     doc.save(`${resume.title || "resume"}.pdf`);
   };
 
@@ -154,10 +185,49 @@ export default function Dashboard({ token, user, api }) {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-2xl shadow-lg w-11/12 md:w-2/3 lg:w-1/2">
             <h3 className="text-xl font-bold mb-4">{preview.title}</h3>
-            <p><strong>Name:</strong> {preview.personal?.fullName}</p>
-            <p><strong>Education:</strong> {preview.education}</p>
-            <p><strong>Skills:</strong> {preview.skills}</p>
-            <p><strong>Experience:</strong> {preview.experience}</p>
+            <p>
+              <strong>Name:</strong> {preview.personal?.fullName}
+            </p>
+
+            <p>
+              <strong>Education:</strong>
+            </p>
+            {preview.education && preview.education.length > 0 ? (
+              preview.education.map((edu, i) => (
+                <div key={i} className="ml-4 text-sm text-gray-600">
+                  {edu.school} ({edu.degree}) {edu.from} - {edu.to}
+                </div>
+              ))
+            ) : (
+              <div className="ml-4 text-sm text-gray-500">
+                No education details
+              </div>
+            )}
+
+            <p>
+              <strong>Skills:</strong>{" "}
+              {Array.isArray(preview.skills)
+                ? preview.skills.join(", ")
+                : preview.skills}
+            </p>
+
+            <p>
+              <strong>Experience:</strong>
+            </p>
+            {preview.experience && preview.experience.length > 0 ? (
+              preview.experience.map((exp, i) => (
+                <div key={i} className="ml-4 text-sm text-gray-600">
+                  {exp.company} - {exp.role} ({exp.from} to {exp.to})
+                  <br />
+                  <em>{exp.description}</em>
+                </div>
+              ))
+            ) : (
+              <div className="ml-4 text-sm text-gray-500">
+                No experience details
+              </div>
+            )}
+
             <button
               onClick={() => setPreview(null)}
               className="mt-4 bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded"
