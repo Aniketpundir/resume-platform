@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { jsPDF } from "jspdf";
 import ResumeForm from "./ResumeForm";
 
 export default function Dashboard({ token, user, api }) {
   const [resumes, setResumes] = useState([]);
   const [editing, setEditing] = useState(null);
+  const [preview, setPreview] = useState(null);
 
   const fetch = async () => {
     const r = await axios.get(api + "/resume", {
@@ -15,7 +17,7 @@ export default function Dashboard({ token, user, api }) {
 
   useEffect(() => {
     if (token) fetch();
-  }, []);
+  }, [token]);
 
   const handleCreate = async (data) => {
     await axios.post(api + "/resume", data, {
@@ -40,9 +42,20 @@ export default function Dashboard({ token, user, api }) {
     fetch();
   };
 
+  const handleDownload = (resume) => {
+    const doc = new jsPDF();
+    doc.setFontSize(16);
+    doc.text(resume.title || "Resume", 10, 20);
+    doc.setFontSize(12);
+    doc.text(`Name: ${resume.personal?.fullName || ""}`, 10, 30);
+    doc.text(`Education: ${resume.education || ""}`, 10, 40);
+    doc.text(`Skills: ${resume.skills || ""}`, 10, 50);
+    doc.text(`Experience: ${resume.experience || ""}`, 10, 60);
+    doc.save(`${resume.title || "resume"}.pdf`);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 via-blue-50 to-purple-100 p-6">
-      {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-extrabold text-gray-800">🎓 Dashboard</h1>
         <div>
@@ -88,9 +101,21 @@ export default function Dashboard({ token, user, api }) {
                     {r.personal?.fullName || ""}
                   </div>
                 </div>
-                <div>
+                <div className="flex gap-2">
                   <button
-                    className="bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1 rounded mr-2 transition"
+                    className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded transition"
+                    onClick={() => setPreview(r)}
+                  >
+                    View
+                  </button>
+                  <button
+                    className="bg-purple-500 hover:bg-purple-600 text-white px-3 py-1 rounded transition"
+                    onClick={() => handleDownload(r)}
+                  >
+                    Download
+                  </button>
+                  <button
+                    className="bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1 rounded transition"
                     onClick={() => setEditing(r)}
                   >
                     Edit
@@ -108,6 +133,7 @@ export default function Dashboard({ token, user, api }) {
         </div>
       </div>
 
+      {/* Edit Resume Modal */}
       {editing && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-2xl shadow-lg w-11/12 md:w-2/3 lg:w-1/2">
@@ -119,6 +145,25 @@ export default function Dashboard({ token, user, api }) {
               onSave={(data) => handleUpdate(editing._id, data)}
               onCancel={() => setEditing(null)}
             />
+          </div>
+        </div>
+      )}
+
+      {/* Preview Resume Modal */}
+      {preview && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-2xl shadow-lg w-11/12 md:w-2/3 lg:w-1/2">
+            <h3 className="text-xl font-bold mb-4">{preview.title}</h3>
+            <p><strong>Name:</strong> {preview.personal?.fullName}</p>
+            <p><strong>Education:</strong> {preview.education}</p>
+            <p><strong>Skills:</strong> {preview.skills}</p>
+            <p><strong>Experience:</strong> {preview.experience}</p>
+            <button
+              onClick={() => setPreview(null)}
+              className="mt-4 bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded"
+            >
+              Close
+            </button>
           </div>
         </div>
       )}

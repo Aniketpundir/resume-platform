@@ -1,83 +1,59 @@
 import React, { useState } from "react";
 
-export default function ResumeForm({ onSave, initial = {}, onCancel }) {
+export default function ResumeForm({ initial = {}, onSave, onCancel }) {
   const [title, setTitle] = useState(initial.title || "");
-  const [fullName, setFullName] = useState(initial.personal?.fullName || "");
-  const [email, setEmail] = useState(initial.personal?.email || "");
-  const [phone, setPhone] = useState(initial.personal?.phone || "");
-  const [summary, setSummary] = useState(initial.personal?.summary || "");
-  const [skills, setSkills] = useState((initial.skills || []).join(", "));
+  const [personal, setPersonal] = useState(initial.personal || { fullName: "" });
+  const [education, setEducation] = useState(initial.education || "");
+  const [skills, setSkills] = useState(initial.skills || "");
+  const [experience, setExperience] = useState(initial.experience || "");
 
-  const submit = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    const payload = {
-      title,
-      personal: { fullName, email, phone, summary },
-      skills: skills.split(",").map((s) => s.trim()).filter(Boolean),
-    };
-    onSave(payload);
+    onSave({ title, personal, education, skills, experience });
   };
 
   return (
-    <form onSubmit={submit} className="space-y-4">
-      <label className="block">
-        <span className="text-gray-700 font-medium">Title</span>
-        <input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="border rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-blue-400"
-        />
-      </label>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-2">
+      <input
+        type="text"
+        placeholder="Resume Title"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        className="border p-2 rounded w-full"
+      />
+      <input
+        type="text"
+        placeholder="Full Name"
+        value={personal.fullName}
+        onChange={(e) => setPersonal({ ...personal, fullName: e.target.value })}
+        className="border p-2 rounded w-full"
+      />
+      <input
+        type="text"
+        placeholder="Education"
+        value={education}
+        onChange={(e) => setEducation(e.target.value)}
+        className="border p-2 rounded w-full"
+      />
+      <input
+        type="text"
+        placeholder="Skills (comma separated)"
+        value={skills}
+        onChange={(e) => setSkills(e.target.value)}
+        className="border p-2 rounded w-full"
+      />
+      <input
+        type="text"
+        placeholder="Experience"
+        value={experience}
+        onChange={(e) => setExperience(e.target.value)}
+        className="border p-2 rounded w-full"
+      />
 
-      <label className="block">
-        <span className="text-gray-700 font-medium">Full Name</span>
-        <input
-          value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
-          className="border rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-blue-400"
-        />
-      </label>
-
-      <label className="block">
-        <span className="text-gray-700 font-medium">Email</span>
-        <input
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="border rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-blue-400"
-        />
-      </label>
-
-      <label className="block">
-        <span className="text-gray-700 font-medium">Phone</span>
-        <input
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          className="border rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-blue-400"
-        />
-      </label>
-
-      <label className="block">
-        <span className="text-gray-700 font-medium">Summary</span>
-        <textarea
-          value={summary}
-          onChange={(e) => setSummary(e.target.value)}
-          className="border rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-purple-400"
-        />
-      </label>
-
-      <label className="block">
-        <span className="text-gray-700 font-medium">Skills (comma separated)</span>
-        <input
-          value={skills}
-          onChange={(e) => setSkills(e.target.value)}
-          className="border rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-green-400"
-        />
-      </label>
-
-      <div className="flex gap-3">
+      <div className="flex gap-2 mt-2">
         <button
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition"
           type="submit"
+          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
         >
           Save
         </button>
@@ -85,7 +61,7 @@ export default function ResumeForm({ onSave, initial = {}, onCancel }) {
           <button
             type="button"
             onClick={onCancel}
-            className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg transition"
+            className="bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded"
           >
             Cancel
           </button>
