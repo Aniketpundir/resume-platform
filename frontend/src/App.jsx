@@ -9,7 +9,7 @@ const API = import.meta.env.VITE_API || "http://localhost:5000";
 export default function App() {
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [user, setUser] = useState(null);
-  const [mode, setMode] = useState("login");
+  const [mode, setMode] = useState("login"); // "login" or "signup"
 
   useEffect(() => {
     if (token) {
@@ -25,9 +25,21 @@ export default function App() {
 
   if (!token) {
     return mode === "login" ? (
-      <Login onLogin={(t) => { setToken(t); localStorage.setItem("token", t); }} switchToSignup={() => setMode("signup")} />
+      <Login
+        onLogin={(t) => {
+          setToken(t);
+          localStorage.setItem("token", t);
+        }}
+        switchToSignup={() => setMode("signup")}
+      />
     ) : (
-      <Signup onSignup={(t) => { setToken(t); localStorage.setItem("token", t); }} switchToLogin={() => setMode("login")} />
+      <Signup
+        onSignup={(t) => {
+          setToken(t);
+          localStorage.setItem("token", t);
+        }}
+        switchToLogin={() => setMode("login")}
+      />
     );
   }
 

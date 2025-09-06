@@ -62,9 +62,7 @@ export default function Signup({ onSignup, switchToLogin }) {
                     Password must include uppercase, lowercase, number, and special character.
                 </p>
 
-                <button
-                    className="mt-2 w-full bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-lg transition"
-                >
+                <button className="mt-2 w-full bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-lg transition">
                     Signup
                 </button>
 
